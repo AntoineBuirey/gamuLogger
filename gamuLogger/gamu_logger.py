@@ -94,7 +94,7 @@ class Logger:
 
         target(result+"\n")
 
-    def __log_element_time(self, target : Target) -> str: # length : + 20
+    def __log_element_time(self, target : Target) -> str: # length : + 21
         if target.type == Target.Type.TERMINAL:
             return f"[{COLORS.BLUE}{get_time()}{COLORS.RESET}]"
         # if the target is a file, we don't need to color the output
@@ -108,7 +108,7 @@ class Logger:
             return f" [ {name} ]"
         return ""
 
-    def __log_element_pid(self, target : Target) -> str: # length : + 12
+    def __log_element_pid(self, target : Target) -> str: # length : + 13
         if self.config['show_pid']:
             pid = f"{os.getpid():^8d}"
             if target.type == Target.Type.TERMINAL:
@@ -142,15 +142,17 @@ class Logger:
     def __log_element_message(self, msg : Message, caller_info : Callerinfo) -> str:
         if not isinstance(msg, str):
             msg = dumps(msg, indent=4, cls=CustomEncoder)
-        indent = 20 + 12
+        indent = 21 # length of the time
+        indent += 12 # length of the level
         if self.config['show_process_name']:
             indent += 25
         if self.config['show_pid']:
-            indent += 12
+            indent += 13
         if self.config['show_threads_name']:
-            indent += 35
+            indent += 25
         if Module.exist(*caller_info):
             indent += 20 * len(Module.get(*caller_info).get_complete_path())
+        indent -= 1 # space before the message
         return f" {replace_newline(msg, indent)}"
 
     def __print_message_in_target(self, msg : Message, color : COLORS, target : Target):
