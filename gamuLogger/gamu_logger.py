@@ -149,7 +149,7 @@ class Logger:
         if self.config['show_pid']:
             indent += 12
         if self.config['show_threads_name']:
-            indent += 25
+            indent += 35
         if Module.exist(*caller_info):
             indent += 20 * len(Module.get(*caller_info).get_complete_path())
         return f" {replace_newline(msg, indent)}"
