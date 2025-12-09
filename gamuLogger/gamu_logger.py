@@ -14,6 +14,7 @@ Antoine Buirey 2025
 
 
 import multiprocessing as mp
+import logging
 import os
 import threading
 from json import dumps
@@ -391,3 +392,28 @@ class Logger:
         #configuring default target
         default_target = Target(TerminalTarget.STDOUT)
         default_target["level"] = Levels.INFO
+        
+    @classmethod
+    def get_handler(cls) -> logging.Handler:
+        """
+        Allow to register the logger as a handler for the standard logging module.
+        Returns:
+            logging.Handler: A logging handler that can be registered in the standard logging module.
+        """
+        class GamuLoggerHandler(logging.Handler):
+            def emit(self, record: logging.LogRecord) -> None:
+                level = Levels.INFO
+                match record.levelno:
+                    case logging.DEBUG:
+                        level = Levels.DEBUG
+                    case logging.WARNING:
+                        level = Levels.WARNING
+                    case logging.ERROR:
+                        level = Levels.ERROR
+                    case logging.CRITICAL:
+                        level = Levels.FATAL
+                    case logging.NOTSET:
+                        level = Levels.TRACE
+                Logger.get_instance().__print(level, record.getMessage(), (record.pathname, record.funcName))
+
+        return GamuLoggerHandler()
