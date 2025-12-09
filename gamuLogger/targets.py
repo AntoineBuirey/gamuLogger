@@ -210,11 +210,17 @@ class Target:
     def __init__(self, target : Callable[[str], None] | TerminalTarget, name : str|None = None):
 
         if isinstance(target, TerminalTarget):
+            def write_flush_stdout(m: str):
+                sys.stdout.write(m)
+                sys.stdout.flush()
+            def write_flush_stderr(m: str):
+                sys.stderr.write(m)
+                sys.stderr.flush()
             match target:
                 case TerminalTarget.STDOUT:
-                    self.target = sys.stdout.write
+                    self.target = write_flush_stdout
                 case TerminalTarget.STDERR:
-                    self.target = sys.stderr.write
+                    self.target = write_flush_stderr
             self.__type = Target.Type.TERMINAL
             self.__name = name if name is not None else str(target)
         elif callable(target):
